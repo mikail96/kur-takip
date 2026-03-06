@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ramex-Mersaş Kur">
+    <link rel="manifest" href="manifest.json">
+    <title>Ramex-Mersaş · TCMB Kur Takip</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(160deg, #080e1a 0%, #111d35 40%, #0c1629 100%);
+            color: #fff; min-height: 100vh; overflow-x: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0f1a2e 0%, #1a2d50 100%);
+            padding: 24px 16px 20px; text-align: center;
+            border-bottom: 1px solid rgba(236,103,26,0.2); position: relative;
+        }
+        .header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #EC671A, #f7b731, #EC671A);
+        }
+        .header h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
+        .header h1 .r { color: #EC671A; }
+        .header h1 .d { color: #556677; }
+        .header h1 .m { color: #f7b731; }
+        .header .sub { margin: 6px 0 0; font-size: 13px; color: #8899aa; font-weight: 500; letter-spacing: 1.5px; }
+        .badge {
+            display: inline-block; margin-top: 8px;
+            background: rgba(236,103,26,0.15); border: 1px solid rgba(236,103,26,0.25);
+            border-radius: 20px; padding: 3px 14px; font-size: 12px; color: #EC671A; font-weight: 700;
+        }
+        .body { padding: 14px 16px; max-width: 420px; margin: 0 auto; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .topbar .date { font-size: 11px; color: #667788; }
+        .btn-update {
+            background: rgba(236,103,26,0.12); border: 1px solid rgba(236,103,26,0.25);
+            border-radius: 20px; color: #EC671A; font-size: 12px; padding: 5px 14px;
+            cursor: pointer; font-weight: 600; font-family: inherit;
+        }
+        .error {
+            background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.25);
+            border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 13px; color: #e74c3c;
+        }
+        .card {
+            border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card .left { display: flex; align-items: center; gap: 12px; }
+        .card .icon { font-size: 30px; }
+        .card .kod { font-size: 15px; font-weight: 600; color: #ddeeff; }
+        .card .isim { font-size: 11px; color: #556677; margin-top: 2px; }
+        .card .tcmb { font-size: 10px; color: #445566; margin-top: 1px; }
+        .card .fiyat { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.5px; line-height: 1; }
+        .card .alt { font-size: 11px; margin-top: 4px; font-weight: 500; }
+        .card-usd { background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.13); }
+        .card-usd .alt { color: #2ecc71; }
+        .card-eur { background: rgba(52,152,219,0.08); border: 1px solid rgba(52,152,219,0.13); }
+        .card-eur .alt { color: #3498db; }
+        .card-gbp { background: rgba(155,89,182,0.08); border: 1px solid rgba(155,89,182,0.13); }
+        .card-gbp .alt { color: #9b59b6; }
+        .card-chf { background: rgba(241,196,15,0.08); border: 1px solid rgba(241,196,15,0.13); }
+        .card-chf .alt { color: #f39c12; }
+        .preview-box {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 14px; margin-top: 16px; margin-bottom: 12px;
+        }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; }
+        .preview-header span { font-size: 12px; color: #8899aa; font-weight: 600; }
+        .preview-toggle {
+            background: none; border: none; color: #EC671A; font-size: 11px;
+            cursor: pointer; font-weight: 600; font-family: inherit;
+        }
+        .preview-text {
+            margin-top: 10px; font-size: 14px; line-height: 1.8; color: #ccddee;
+            white-space: pre-wrap; background: rgba(0,0,0,0.2); border-radius: 10px;
+            padding: 12px; display: none;
+        }
+        .preview-text.show { display: block; }
+        .btn-action {
+            display: block; width: 100%; border: none; border-radius: 14px; color: #fff;
+            font-size: 16px; font-weight: 700; padding: 16px; cursor: pointer;
+            margin-top: 10px; font-family: inherit; transition: all 0.3s ease;
+        }
+        .btn-copy {
+            background: linear-gradient(135deg, #EC671A, #e67e22);
+            box-shadow: 0 4px 20px rgba(236,103,26,0.35);
+        }
+        .btn-copy.copied {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 20px rgba(39,174,96,0.4);
+        }
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            box-shadow: 0 4px 20px rgba(37,211,102,0.25);
+        }
+        .footer {
+            text-align: center; margin-top: 28px; padding-bottom: 24px;
+            font-size: 10px; color: #334455; line-height: 1.6;
+        }
+        .loading { text-align: center; padding: 40px 0; color: #667788; font-size: 14px; }
+        .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #334455;
+            border-top-color: #EC671A; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span class="r">Ramex</span><span class="d">-</span><span class="m">Mersaş</span></h1>
+        <p class="sub">TCMB Günlük Kur Takibi</p>
+        <div class="badge">%10</div>
+    </div>
+
+    <div class="body">
+        <div class="topbar">
+            <span class="date" id="tarih">Yükleniyor...</span>
+            <button class="btn-update" id="btnGuncelle" onclick="kurlariCek()">🔄 Güncelle</button>
+        </div>
+
+        <div id="hata" class="error" style="display:none"></div>
+        <div id="loading" class="loading"><div class="spinner"></div><br>Kurlar çekiliyor...</div>
+        <div id="kartlar"></div>
+
+        <div class="preview-box" id="previewBox" style="display:none">
+            <div class="preview-header">
+                <span>📋 WhatsApp Mesajı</span>
+                <button class="preview-toggle" onclick="togglePreview()">Göster ▼</button>
+            </div>
+            <div class="preview-text" id="previewText"></div>
+        </div>
+
+        <button class="btn-action btn-copy" id="btnKopyala" style="display:none" onclick="kopyala()">
+            📋 Mesajı Kopyala
+        </button>
+        <button class="btn-action btn-whatsapp" id="btnWhatsapp" style="display:none" onclick="whatsappPaylas()">
+            💬 WhatsApp'ta Paylaş
+        </button>
+
+        <div class="footer">
+            Kaynak: T.C. Merkez Bankası Efektif Alış Kuru<br>
+            Ramex-Mersaş · <span id="yil"></span>
+        </div>
+    </div>
+
+<script>
+const INDIRIM = 0.10;
+let kurlar = null;
+
+const dovizler = {
+    USD: { sembol: '$', isim: 'Amerikan Doları', icon: '💵', cls: 'card-usd' },
+    EUR: { sembol: '€', isim: 'Euro', icon: '💶', cls: 'card-eur' },
+    GBP: { sembol: '£', isim: 'İngiliz Sterlini', icon: '💷', cls: 'card-gbp' },
+    CHF: { sembol: 'Frank', isim: 'İsviçre Frangı', icon: '🏧', cls: 'card-chf' },
+};
+
+document.getElementById('yil').textContent = new Date().getFullYear();
+
+async function kurlariCek() {
+    const btnG = document.getElementById('btnGuncelle');
+    const loading = document.getElementById('loading');
+    const hataDiv = document.getElementById('hata');
+
+    btnG.textContent = '⏳ Çekiliyor...';
+    btnG.disabled = true;
+    loading.style.display = 'block';
+    hataDiv.style.display = 'none';
+    document.getElementById('kartlar').innerHTML = '';
+    document.getElementById('previewBox').style.display = 'none';
+    document.getElementById('btnKopyala').style.display = 'none';
+    document.getElementById('btnWhatsapp').style.display = 'none';
+
+    try {
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.tcmb.gov.tr/kurlar/today.xml');
+        const r = await fetch(proxyUrl);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const xml = await r.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        const currencies = doc.querySelectorAll('Currency');
+
+        kurlar = {};
+        currencies.forEach(c => {
+            const kod = c.getAttribute('Kod');
+            if (dovizler[kod]) {
+                const eaNode = c.querySelector('BanknoteBuying');
+                if (eaNode && eaNode.textContent) {
+                    const ea = parseFloat(eaNode.textContent.replace(',', '.'));
+                    if (!isNaN(ea) && ea > 0) {
+                        kurlar[kod] = {
+                            efektifAlis: ea,
+                            hesaplanan: ea * (1 - INDIRIM),
+                        };
+                    }
+                }
+            }
+        });
+
+        if (Object.keys(kurlar).length === 0) {
+            throw new Error('Kur verisi bulunamadı');
+        }
+
+        kartlariGoster();
+        const now = new Date();
+        document.getElementById('tarih').textContent =
+            now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) +
+            ' · ' + now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    } catch (e) {
+        hataDiv.textContent = '⚠️ ' + (e.message || 'Kurlar alınamadı. İnternet bağlantınızı kontrol edin.');
+        hataDiv.style.display = 'block';
+    }
+
+    loading.style.display = 'none';
+    btnG.textContent = '🔄 Güncelle';
+    btnG.disabled = false;
+}
+
+function kartlariGoster() {
+    let html = '';
+    ['USD', 'EUR', 'GBP', 'CHF'].forEach(kod => {
+        if (!kurlar[kod]) return;
+        const k = kurlar[kod];
+        const d = dovizler[kod];
+        const fiyat = k.hesaplanan.toFixed(2).replace('.', ',');
+        html += `
+        <div class="card ${d.cls}">
+            <div class="left">
+                <span class="icon">${d.icon}</span>
+                <div>
+                    <div class="kod">${kod}</div>
+                    <div class="isim">${d.isim}</div>
+                    <div class="tcmb">TCMB: ${k.efektifAlis.toFixed(4)} ₺</div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div class="fiyat">${fiyat}</div>
+                <div class="alt">${d.sembol} · %${INDIRIM * 100}</div>
+            </div>
+        </div>`;
+    });
+    document.getElementById('kartlar').innerHTML = html;
+    document.getElementById('previewBox').style.display = 'block';
+    document.getElementById('previewText').textContent = mesajOlustur();
+    document.getElementById('btnKopyala').style.display = 'block';
+    document.getElementById('btnWhatsapp').style.display = 'block';
+}
+
+function mesajOlustur() {
+    if (!kurlar) return '';
+    const satirlar = [];
+    ['USD', 'EUR', 'GBP', 'CHF'].forEach(kod => {
+        if (kurlar[kod]) {
+            const f = kurlar[kod].hesaplanan.toFixed(2).replace('.', ',');
+            satirlar.push(dovizler[kod].sembol + '—' + f);
+        }
+    });
+    satirlar.push('');
+    satirlar.push('Kurlarımızı güncelleyelim arkadaşlar iyi çalışmalar.');
+    return satirlar.join('\n');
+}
+
+function togglePreview() {
+    const t = document.getElementById('previewText');
+    const btn = document.querySelector('.preview-toggle');
+    if (t.classList.contains('show')) {
+        t.classList.remove('show');
+        btn.textContent = 'Göster ▼';
+    } else {
+        t.classList.add('show');
+        btn.textContent = 'Gizle ▲';
+    }
+}
+
+async function kopyala() {
+    const mesaj = mesajOlustur();
+    const btn = document.getElementById('btnKopyala');
+    try {
+        await navigator.clipboard.writeText(mesaj);
+    } catch {
+        const ta = document.createElement('textarea');
+        ta.value = mesaj; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+    }
+    btn.textContent = '✅ Kopyalandı! Yapıştırabilirsin';
+    btn.classList.add('copied');
+    setTimeout(() => {
+        btn.textContent = '📋 Mesajı Kopyala';
+        btn.classList.remove('copied');
+    }, 2500);
+}
+
+function whatsappPaylas() {
+    const mesaj = mesajOlustur();
+    window.open('https://wa.me/?text=' + encodeURIComponent(mesaj), '_blank');
+}
+
+// Sayfa açılınca çek
+kurlariCek();
+</script>
+</body>
+</html>
