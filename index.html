@@ -115,17 +115,14 @@
         <p class="sub">TCMB Günlük Kur Takibi</p>
         <div class="badge">%10</div>
     </div>
-
     <div class="body">
         <div class="topbar">
             <span class="date" id="tarih">Yükleniyor...</span>
             <button class="btn-update" id="btnGuncelle" onclick="kurlariCek()">🔄 Güncelle</button>
         </div>
-
         <div id="hata" class="error" style="display:none"></div>
         <div id="loading" class="loading"><div class="spinner"></div><br>Kurlar çekiliyor...</div>
         <div id="kartlar"></div>
-
         <div class="preview-box" id="previewBox" style="display:none">
             <div class="preview-header">
                 <span>📋 WhatsApp Mesajı</span>
@@ -133,68 +130,26 @@
             </div>
             <div class="preview-text" id="previewText"></div>
         </div>
-
-        <button class="btn-action btn-copy" id="btnKopyala" style="display:none" onclick="kopyala()">
-            📋 Mesajı Kopyala
-        </button>
-        <button class="btn-action btn-whatsapp" id="btnWhatsapp" style="display:none" onclick="whatsappPaylas()">
-            💬 WhatsApp'ta Paylaş
-        </button>
-
-        <div class="footer">
-            Kaynak: T.C. Merkez Bankası Efektif Alış Kuru<br>
-            Ramex-Mersaş · <span id="yil"></span>
-        </div>
+        <button class="btn-action btn-copy" id="btnKopyala" style="display:none" onclick="kopyala()">📋 Mesajı Kopyala</button>
+        <button class="btn-action btn-whatsapp" id="btnWhatsapp" style="display:none" onclick="whatsappPaylas()">💬 WhatsApp'ta Paylaş</button>
+        <div class="footer">Kaynak: T.C. Merkez Bankası Efektif Alış Kuru<br>Ramex-Mersaş · <span id="yil"></span></div>
     </div>
-
 <script>
-const INDIRIM = 0.10;
-let kurlar = null;
-
-const dovizler = {
-    USD: { sembol: '$', isim: 'Amerikan Doları', icon: '💵', cls: 'card-usd' },
-    EUR: { sembol: '€', isim: 'Euro', icon: '💶', cls: 'card-eur' },
-    GBP: { sembol: '£', isim: 'İngiliz Sterlini', icon: '💷', cls: 'card-gbp' },
-    CHF: { sembol: 'Frank', isim: 'İsviçre Frangı', icon: '🏧', cls: 'card-chf' },
+var INDIRIM = 0.10;
+var WORKER_URL = 'https://kur-proxy.mikailaymaz1.workers.dev';
+var kurlar = null;
+var dovizler = {
+    USD: {sembol:'$', isim:'Amerikan Doları', icon:'💵', cls:'card-usd'},
+    EUR: {sembol:'€', isim:'Euro', icon:'💶', cls:'card-eur'},
+    GBP: {sembol:'£', isim:'İngiliz Sterlini', icon:'💷', cls:'card-gbp'},
+    CHF: {sembol:'Frank', isim:'İsviçre Frangı', icon:'🏧', cls:'card-chf'}
 };
-
 document.getElementById('yil').textContent = new Date().getFullYear();
 
-// Birden fazla proxy dene — hangisi çalışırsa onu kullan
-const TCMB_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml';
-const PROXY_LIST = [
-    url => 'https://corsproxy.io/?' + encodeURIComponent(url),
-    url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
-    url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
-    url => 'https://cors-anywhere.herokuapp.com/' + url,
-];
-
-async function fetchWithProxies(url) {
-    for (let i = 0; i < PROXY_LIST.length; i++) {
-        const proxyUrl = PROXY_LIST[i](url);
-        try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 8000);
-            const r = await fetch(proxyUrl, { signal: controller.signal });
-            clearTimeout(timeout);
-            if (r.ok) {
-                const text = await r.text();
-                if (text.includes('Currency') || text.includes('Tarih_Date')) {
-                    return text;
-                }
-            }
-        } catch (e) {
-            // Bu proxy çalışmadı, sonrakini dene
-        }
-    }
-    throw new Error('Tüm kaynaklar denendi, kur verisi alınamadı.');
-}
-
 async function kurlariCek() {
-    const btnG = document.getElementById('btnGuncelle');
-    const loading = document.getElementById('loading');
-    const hataDiv = document.getElementById('hata');
-
+    var btnG = document.getElementById('btnGuncelle');
+    var loading = document.getElementById('loading');
+    var hataDiv = document.getElementById('hata');
     btnG.textContent = '⏳ Çekiliyor...';
     btnG.disabled = true;
     loading.style.display = 'block';
@@ -203,85 +158,47 @@ async function kurlariCek() {
     document.getElementById('previewBox').style.display = 'none';
     document.getElementById('btnKopyala').style.display = 'none';
     document.getElementById('btnWhatsapp').style.display = 'none';
-
     try {
-        // Önce bugünün kurunu dene
-        let xml;
-        try {
-            xml = await fetchWithProxies(TCMB_URL);
-        } catch {
-            // Hafta sonu / tatil fallback — önceki iş gününü dene
-            const tarih = new Date();
-            tarih.setDate(tarih.getDate() - 1);
-            while (tarih.getDay() === 0 || tarih.getDay() === 6) {
-                tarih.setDate(tarih.getDate() - 1);
-            }
-            const yil = tarih.getFullYear();
-            const ay = String(tarih.getMonth() + 1).padStart(2, '0');
-            const gun = String(tarih.getDate()).padStart(2, '0');
-            const altUrl = 'https://www.tcmb.gov.tr/kurlar/' + yil + ay + '/' + gun + ay + yil + '.xml';
-            xml = await fetchWithProxies(altUrl);
-        }
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xml, 'text/xml');
-        const currencies = doc.querySelectorAll('Currency');
-
+        var r = await fetch(WORKER_URL);
+        var data = await r.json();
+        if (data.error) throw new Error(data.error);
         kurlar = {};
-        currencies.forEach(c => {
-            const kod = c.getAttribute('Kod');
-            if (dovizler[kod]) {
-                const eaNode = c.querySelector('BanknoteBuying');
-                if (eaNode && eaNode.textContent) {
-                    const ea = parseFloat(eaNode.textContent.replace(',', '.'));
-                    if (!isNaN(ea) && ea > 0) {
-                        kurlar[kod] = {
-                            efektifAlis: ea,
-                            hesaplanan: ea * (1 - INDIRIM),
-                        };
-                    }
-                }
+        var kodlar = ['USD','EUR','GBP','CHF'];
+        for (var i = 0; i < kodlar.length; i++) {
+            var kod = kodlar[i];
+            if (data[kod]) {
+                kurlar[kod] = {
+                    efektifAlis: data[kod].efektifAlis,
+                    hesaplanan: data[kod].efektifAlis * (1 - INDIRIM)
+                };
             }
-        });
-
-        if (Object.keys(kurlar).length === 0) {
-            throw new Error('Kur verisi bulunamadı. Hafta sonu olabilir.');
         }
-
+        if (Object.keys(kurlar).length === 0) throw new Error('Kur verisi bulunamadi');
         kartlariGoster();
-        const now = new Date();
+        var now = new Date();
         document.getElementById('tarih').textContent =
-            now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) +
-            ' · ' + now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
+            now.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}) +
+            ' · ' + now.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
     } catch (e) {
-        hataDiv.textContent = '⚠️ ' + (e.message || 'Kurlar alınamadı. İnternet bağlantınızı kontrol edin.');
+        hataDiv.textContent = '⚠️ ' + (e.message || 'Kurlar alinamadi.');
         hataDiv.style.display = 'block';
     }
-
     loading.style.display = 'none';
     btnG.textContent = '🔄 Güncelle';
     btnG.disabled = false;
 }
 
 function kartlariGoster() {
-    let html = '';
-    ['USD', 'EUR', 'GBP', 'CHF'].forEach(kod => {
-        if (!kurlar[kod]) return;
-        const k = kurlar[kod];
-        const d = dovizler[kod];
-        const fiyat = k.hesaplanan.toFixed(2).replace('.', ',');
-        html += '<div class="card ' + d.cls + '">' +
-            '<div class="left"><span class="icon">' + d.icon + '</span><div>' +
-            '<div class="kod">' + kod + '</div>' +
-            '<div class="isim">' + d.isim + '</div>' +
-            '<div class="tcmb">TCMB: ' + k.efektifAlis.toFixed(4) + ' ₺</div>' +
-            '</div></div>' +
-            '<div style="text-align:right">' +
-            '<div class="fiyat">' + fiyat + '</div>' +
-            '<div class="alt">' + d.sembol + ' · %' + (INDIRIM * 100) + '</div>' +
-            '</div></div>';
-    });
+    var html = '';
+    var kodlar = ['USD','EUR','GBP','CHF'];
+    for (var i = 0; i < kodlar.length; i++) {
+        var kod = kodlar[i];
+        if (!kurlar[kod]) continue;
+        var k = kurlar[kod];
+        var d = dovizler[kod];
+        var fiyat = k.hesaplanan.toFixed(2).replace('.', ',');
+        html += '<div class="card ' + d.cls + '"><div class="left"><span class="icon">' + d.icon + '</span><div><div class="kod">' + kod + '</div><div class="isim">' + d.isim + '</div><div class="tcmb">TCMB: ' + k.efektifAlis.toFixed(4) + ' ₺</div></div></div><div style="text-align:right"><div class="fiyat">' + fiyat + '</div><div class="alt">' + d.sembol + ' · %' + (INDIRIM*100) + '</div></div></div>';
+    }
     document.getElementById('kartlar').innerHTML = html;
     document.getElementById('previewBox').style.display = 'block';
     document.getElementById('previewText').textContent = mesajOlustur();
@@ -291,21 +208,23 @@ function kartlariGoster() {
 
 function mesajOlustur() {
     if (!kurlar) return '';
-    const satirlar = [];
-    ['USD', 'EUR', 'GBP', 'CHF'].forEach(kod => {
+    var satirlar = [];
+    var kodlar = ['USD','EUR','GBP','CHF'];
+    for (var i = 0; i < kodlar.length; i++) {
+        var kod = kodlar[i];
         if (kurlar[kod]) {
-            const f = kurlar[kod].hesaplanan.toFixed(2).replace('.', ',');
+            var f = kurlar[kod].hesaplanan.toFixed(2).replace('.', ',');
             satirlar.push(dovizler[kod].sembol + '—' + f);
         }
-    });
+    }
     satirlar.push('');
     satirlar.push('Kurlarımızı güncelleyelim arkadaşlar iyi çalışmalar.');
     return satirlar.join('\n');
 }
 
 function togglePreview() {
-    const t = document.getElementById('previewText');
-    const btn = document.querySelector('.preview-toggle');
+    var t = document.getElementById('previewText');
+    var btn = document.querySelector('.preview-toggle');
     if (t.classList.contains('show')) {
         t.classList.remove('show');
         btn.textContent = 'Göster ▼';
@@ -316,26 +235,21 @@ function togglePreview() {
 }
 
 async function kopyala() {
-    const mesaj = mesajOlustur();
-    const btn = document.getElementById('btnKopyala');
-    try {
-        await navigator.clipboard.writeText(mesaj);
-    } catch {
-        const ta = document.createElement('textarea');
+    var mesaj = mesajOlustur();
+    var btn = document.getElementById('btnKopyala');
+    try { await navigator.clipboard.writeText(mesaj); } catch {
+        var ta = document.createElement('textarea');
         ta.value = mesaj; ta.style.position = 'fixed'; ta.style.left = '-9999px';
         document.body.appendChild(ta); ta.select(); document.execCommand('copy');
         document.body.removeChild(ta);
     }
     btn.textContent = '✅ Kopyalandı! Yapıştırabilirsin';
     btn.classList.add('copied');
-    setTimeout(() => {
-        btn.textContent = '📋 Mesajı Kopyala';
-        btn.classList.remove('copied');
-    }, 2500);
+    setTimeout(function() { btn.textContent = '📋 Mesajı Kopyala'; btn.classList.remove('copied'); }, 2500);
 }
 
 function whatsappPaylas() {
-    const mesaj = mesajOlustur();
+    var mesaj = mesajOlustur();
     window.open('https://wa.me/?text=' + encodeURIComponent(mesaj), '_blank');
 }
 
