@@ -1,22 +1,12 @@
 {
-    "name": "Ramex-Mersaş Kur Takip",
-    "short_name": "Kur Takip",
-    "description": "TCMB Günlük Kur Takibi - Ramex-Mersaş",
-    "start_url": "/kur-takip/",
-    "display": "standalone",
-    "background_color": "#080e1a",
-    "theme_color": "#0f1a2e",
-    "orientation": "portrait",
-    "icons": [
-        {
-            "src": "icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "RAMEX&MERSAŞ Kasa & Kur Takip",
+  "short_name": "Ramex Kasa",
+  "start_url": "/kur-takip/",
+  "display": "standalone",
+  "background_color": "#0f0f1e",
+  "theme_color": "#0f0f1e",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
 }
