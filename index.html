@@ -52,7 +52,7 @@ button{cursor:pointer}
 .form-row input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.03);color:var(--text);font-size:15px;font-weight:600;transition:border-color .2s}
 .form-row input:focus{border-color:var(--gold)}
 .form-row .rate{font-size:9px;color:var(--text2);width:46px;text-align:right;flex-shrink:0}
-.form-row .result{font-size:11px;font-weight:700;color:var(--gold);width:60px;text-align:right;flex-shrink:0}
+.form-row .result{font-size:11px;font-weight:700;color:var(--gold);width:56px;text-align:right;flex-shrink:0;padding-right:2px}
 .form-row .info-tag{font-size:9px;color:var(--text2);font-style:italic;flex-shrink:0}
 .summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px}
 .sum-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
@@ -170,7 +170,7 @@ button{cursor:pointer}
 <div class="form-card fade-up d3">
 <div class="form-row"><label>TL</label><input type="number" id="inputTL" placeholder="0" oninput="hesapla()"><span class="result" id="resTL">0,00</span></div>
 <div class="form-row"><label>FLOAT</label><input type="number" id="inputFloat" value="2000" oninput="hesapla()"></div>
-<div class="form-row"><label>ÇIKIŞ</label><input type="number" id="inputCikis" placeholder="0"><span class="info-tag">sadece bilgi</span></div>
+<div class="form-row"><label style="width:auto;white-space:nowrap;font-size:10px">KASA ÇIKIŞI</label><input type="number" id="inputCikis" placeholder="0"><span class="info-tag">sadece bilgi</span></div>
 <div class="form-row"><label>MİCROS</label><input type="number" id="inputMicros" placeholder="0" oninput="hesapla()"></div>
 </div>
 <div class="summary-card fade-up d5">
@@ -311,7 +311,7 @@ function buildRows(){
 
 function hesapla(){
   var dt=0;
-  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?(kasaRates[k]||0):0,s=a*r;dt+=s;document.getElementById('res_'+k).textContent=fT(s);});
+  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?(kasaRates[k]||0):0,s=a*r;dt+=s;document.getElementById('res_'+k).textContent=fR(s);});
   var tl=pF('inputTL');
   document.getElementById('resTL').textContent=fT(tl);
   var ts=dt+tl;
@@ -390,7 +390,7 @@ function gecmisFisleri(){
       det+='TL: <span>'+fT(f.toplamTL)+' TL</span><br>';
       det+='Toplam Sonuç: <span>'+fT(f.toplamSonuc)+' TL</span><br>';
       det+='Float: <span>-'+fT(f.kasaFloat||0)+' TL</span><br>';
-      if(f.kasaCikisi)det+='Çıkış: <span>'+fT(f.kasaCikisi)+' TL</span><br>';
+      if(f.kasaCikisi)det+='Kasa Çıkışı: <span>'+fT(f.kasaCikisi)+' TL</span><br>';
       det+='Micros: <span>-'+fT(f.microsTotal)+' TL</span>';
       h+='<div class="history-item" onclick="toggleHi('+idx+')"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+f.storeName+'</span></div><div class="hi-result '+col+'">'+fT(f.genelSonuc)+' TL</div><div class="hi-detail" id="hd-'+idx+'">'+det+'</div></div>';
     });
@@ -453,6 +453,7 @@ async function kurKopyala(){
 function kurWhatsapp(){window.open('https://wa.me/?text='+encodeURIComponent(kurMsg()),'_blank');}
 
 function fT(n){return n.toFixed(2).replace('.',',');}
+function fR(n){return (Math.round(n*10)/10).toFixed(2).replace('.',',');}
 function fN(n){return n?n.toFixed(2).replace('.',','):'0,00';}
 function pF(id){return parseFloat(document.getElementById(id).value)||0;}
 </script>
