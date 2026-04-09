@@ -311,7 +311,7 @@ function buildRows(){
 
 function hesapla(){
   var dt=0;
-  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?(kasaRates[k]||0):0,s=a*r;dt+=s;document.getElementById('res_'+k).textContent=fR(s);});
+  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?Math.round((kasaRates[k]||0)*100)/100:0,s=a*r;s=Math.round(s*100)/100;dt+=s;document.getElementById('res_'+k).textContent=fT(s);});
   var tl=pF('inputTL');
   document.getElementById('resTL').textContent=fT(tl);
   var ts=dt+tl;
@@ -332,7 +332,7 @@ function hesapla(){
 
 function kaydet(){
   var am={},res={},dt=0;
-  DOVIZLER.forEach(function(k){am[k]=pF('inp_'+k);res[k]=am[k]*(kasaRates[k]||0);dt+=res[k];});
+  DOVIZLER.forEach(function(k){am[k]=pF('inp_'+k);var r2=Math.round((kasaRates[k]||0)*100)/100;res[k]=Math.round(am[k]*r2*100)/100;dt+=res[k];});
   var tl=pF('inputTL'),fl=pF('inputFloat'),cx=pF('inputCikis'),mi=pF('inputMicros');
   var ts=dt+tl,net=ts-fl,g=net-mi;
   var fd={store:currentStore,storeName:STORES[currentStore].name,date:new Date().toISOString(),amounts:am,toplamTL:tl,microsTotal:mi,kasaFloat:fl,kasaCikisi:cx,rates:kasaRates,results:res,dovizToplam:dt,toplamSonuc:ts,genelSonuc:g};
@@ -382,6 +382,7 @@ function gecmisFisleri(){
     var items=[];s.forEach(function(c){var v=c.val();if(v.store===currentStore)items.push(v);});
     items.reverse();var h='';
     if(!items.length)h='<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">Kayıt bulunamadı</div>';
+    histData=items;
     items.forEach(function(f,idx){
       var d=new Date(f.date),ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}),tms=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
       var col=f.genelSonuc>=0?'val-green':'val-red';
@@ -392,10 +393,19 @@ function gecmisFisleri(){
       det+='Float: <span>-'+fT(f.kasaFloat||0)+' TL</span><br>';
       if(f.kasaCikisi)det+='Kasa Çıkışı: <span>'+fT(f.kasaCikisi)+' TL</span><br>';
       det+='Micros: <span>-'+fT(f.microsTotal)+' TL</span>';
+      det+='<div style="margin-top:8px"><button class="btn-green" style="margin:0;padding:10px;font-size:11px" onclick="event.stopPropagation();shareHist('+idx+')">WHATSAPP PAYLAŞ</button></div>';
       h+='<div class="history-item" onclick="toggleHi('+idx+')"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+f.storeName+'</span></div><div class="hi-result '+col+'">'+fT(f.genelSonuc)+' TL</div><div class="hi-detail" id="hd-'+idx+'">'+det+'</div></div>';
     });
     document.getElementById('historyList').innerHTML=h;
   });
+}
+var histData=[];
+function shareHist(i){
+  var f=histData[i];if(!f)return;
+  lastFis=f;
+  var logo=document.getElementById('logo-'+f.store).src;
+  document.getElementById('formStoreLogo').src=logo;
+  whatsappFisPaylas();
 }
 function toggleHi(i){var el=document.getElementById('hd-'+i);el.classList.toggle('show');}
 function backToForm(){document.getElementById('stepHistory').style.display='none';document.getElementById('stepForm').style.display='block';}
@@ -453,7 +463,6 @@ async function kurKopyala(){
 function kurWhatsapp(){window.open('https://wa.me/?text='+encodeURIComponent(kurMsg()),'_blank');}
 
 function fT(n){return n.toFixed(2).replace('.',',');}
-function fR(n){return (Math.round(n*10)/10).toFixed(2).replace('.',',');}
 function fN(n){return n?n.toFixed(2).replace('.',','):'0,00';}
 function pF(id){return parseFloat(document.getElementById(id).value)||0;}
 </script>
