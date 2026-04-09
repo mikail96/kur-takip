@@ -379,7 +379,7 @@ function gecmisFisleri(){
   document.getElementById('stepHistory').style.display='block';
   var wa=new Date(Date.now()-7*864e5).toISOString();
   db.ref('kasaFisler').orderByChild('date').startAt(wa).once('value').then(function(s){
-    var items=[];s.forEach(function(c){var v=c.val();if(v.store===currentStore)items.push(v);});
+    var items=[];s.forEach(function(c){var v=c.val();v._key=c.key;if(v.store===currentStore)items.push(v);});
     items.reverse();var h='';
     if(!items.length)h='<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">Kayıt bulunamadı</div>';
     histData=items;
@@ -393,13 +393,22 @@ function gecmisFisleri(){
       det+='Float: <span>-'+fT(f.kasaFloat||0)+' TL</span><br>';
       if(f.kasaCikisi)det+='Kasa Çıkışı: <span>'+fT(f.kasaCikisi)+' TL</span><br>';
       det+='Micros: <span>-'+fT(f.microsTotal)+' TL</span>';
-      det+='<div style="margin-top:8px"><button class="btn-green" style="margin:0;padding:10px;font-size:11px" onclick="event.stopPropagation();shareHist('+idx+')">WHATSAPP PAYLAŞ</button></div>';
+      det+='<div style="margin-top:8px;display:flex;gap:6px"><button class="btn-green" style="margin:0;padding:10px;font-size:11px;flex:1" onclick="event.stopPropagation();shareHist('+idx+')">WHATSAPP PAYLAŞ</button><button style="margin:0;padding:10px;font-size:11px;flex:1;border:1px solid var(--red);border-radius:10px;background:transparent;color:var(--red);font-weight:700;font-family:inherit;cursor:pointer" onclick="event.stopPropagation();silFis('+idx+')">SİL</button></div>';
       h+='<div class="history-item" onclick="toggleHi('+idx+')"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+f.storeName+'</span></div><div class="hi-result '+col+'">'+fT(f.genelSonuc)+' TL</div><div class="hi-detail" id="hd-'+idx+'">'+det+'</div></div>';
     });
     document.getElementById('historyList').innerHTML=h;
   });
 }
 var histData=[];
+function silFis(i){
+  var f=histData[i];if(!f||!f._key)return;
+  var pw=prompt('Silmek için yönetici şifresini girin:');
+  if(pw!=='3636'){if(pw!==null)alert('Yanlış şifre');return;}
+  db.ref('kasaFisler/'+f._key).remove().then(function(){
+    alert('Fiş silindi');
+    gecmisFisleri();
+  }).catch(function(e){alert('Hata: '+e.message);});
+}
 function shareHist(i){
   var f=histData[i];if(!f)return;
   lastFis=f;
