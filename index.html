@@ -33,7 +33,7 @@ button{cursor:pointer}
 .tabs{display:flex;gap:4px;padding:14px 16px 0}
 .tab-btn{flex:1;padding:11px 0;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);font-size:11.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase;transition:all .25s;font-family:inherit}
 .tab-btn.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0f0f1e;border-color:var(--gold);box-shadow:0 4px 20px rgba(201,168,76,.25)}
-.panel{display:none;padding:14px 16px 24px}.panel.active{display:block}
+.panel{display:none;padding:14px 12px 24px}.panel.active{display:block}
 .store-grid{display:flex;gap:8px;margin-bottom:14px}
 .store-card{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:all .25s;background:var(--card)}
 .store-card img{width:56px;height:56px;object-fit:contain;border-radius:10px;margin-bottom:8px;background:#fff;padding:5px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -45,14 +45,14 @@ button{cursor:pointer}
 .pw-box input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:16px;text-align:center;letter-spacing:8px}
 .pw-box .err{color:var(--red);font-size:11px;text-align:center;margin-top:4px;display:none}
 .section-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin:16px 0 8px;padding-left:2px}
-.form-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px}
 .form-card .form-row:last-child{margin-bottom:0}
-.form-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.form-row label{width:44px;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0}
+.form-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.form-row label{width:40px;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0}
 .form-row input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.03);color:var(--text);font-size:15px;font-weight:600;transition:border-color .2s}
 .form-row input:focus{border-color:var(--gold)}
-.form-row .rate{font-size:9px;color:var(--text2);width:50px;text-align:right;flex-shrink:0}
-.form-row .result{font-size:12px;font-weight:700;color:var(--gold);width:68px;text-align:right;flex-shrink:0}
+.form-row .rate{font-size:9px;color:var(--text2);width:46px;text-align:right;flex-shrink:0}
+.form-row .result{font-size:11px;font-weight:700;color:var(--gold);width:60px;text-align:right;flex-shrink:0}
 .form-row .info-tag{font-size:9px;color:var(--text2);font-style:italic;flex-shrink:0}
 .summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px}
 .sum-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
@@ -67,16 +67,28 @@ button{cursor:pointer}
 .history-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
 .history-item .hi-top{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px}
 .history-item .hi-result{font-size:16px;font-weight:700}
-#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#fff;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
-#receiptArea .rc-header{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
-#receiptArea .rc-header .rc-logo{width:48px;height:48px;object-fit:contain;margin-bottom:4px}
-#receiptArea .rc-header h2{font-size:15px;letter-spacing:2px}
-#receiptArea .rc-header .rc-date{font-size:11px;color:#666;margin-top:2px}
-#receiptArea .rc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px dotted #ddd}
-#receiptArea .rc-row.rc-bold{font-weight:700;font-size:13px}
-#receiptArea .rc-section{font-size:10px;font-weight:700;color:#888;letter-spacing:1px;margin:8px 0 4px;text-transform:uppercase}
-#receiptArea .rc-footer{text-align:center;font-size:9px;color:#999;margin-top:10px;border-top:1px solid #ddd;padding-top:8px}
-#receiptArea .rc-big{font-size:18px;font-weight:800;text-align:center;padding:8px 0;margin-top:4px}
+.history-item{cursor:pointer}
+.hi-detail{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.8}
+.hi-detail.show{display:block}
+.hi-detail span{color:var(--text)}
+#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#fff;color:#1a1a2e;font-family:"DM Sans",sans-serif;padding:24px;border-radius:12px}
+#receiptArea .rc-header{text-align:center;padding-bottom:14px;margin-bottom:14px;border-bottom:3px solid #1a1a2e}
+#receiptArea .rc-header .rc-logo{width:52px;height:52px;object-fit:contain;margin-bottom:6px;border-radius:8px}
+#receiptArea .rc-header h2{font-size:16px;letter-spacing:3px;font-weight:800}
+#receiptArea .rc-header .rc-date{font-size:11px;color:#666;margin-top:3px}
+#receiptArea .rc-section{font-size:10px;font-weight:700;color:#fff;letter-spacing:2px;margin:12px 0 6px;text-transform:uppercase;background:#1a1a2e;padding:4px 8px;border-radius:4px;display:inline-block}
+#receiptArea .rc-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid #eee}
+#receiptArea .rc-row .rc-cur{font-weight:700}
+#receiptArea .rc-row.rc-bold{font-weight:700;font-size:13px;border-bottom:2px solid #1a1a2e;padding:8px 0}
+#receiptArea .rc-row .rc-val{font-weight:600}
+#receiptArea .rc-footer{text-align:center;font-size:9px;color:#999;margin-top:14px;border-top:2px solid #1a1a2e;padding-top:10px}
+#receiptArea .rc-big{font-size:20px;font-weight:800;text-align:center;padding:10px 0;margin-top:6px;border-radius:8px}
+.rc-big-pos{background:#e6f9f0;color:#16a34a}
+.rc-big-neg{background:#fef2f2;color:#ef4444}
+#receiptArea .rc-cur-eur{color:#2563eb}
+#receiptArea .rc-cur-usd{color:#16a34a}
+#receiptArea .rc-cur-gbp{color:#7c3aed}
+#receiptArea .rc-cur-chf{color:#d97706}
 .kur-badge{display:inline-block;margin:8px auto 14px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:3px 14px;font-size:11px;color:var(--gold);font-weight:700}
 .kur-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .kur-topbar .date{font-size:11px;color:var(--text2)}
@@ -336,18 +348,20 @@ function whatsappFisPaylas(){
   var f=lastFis,ra=document.getElementById('receiptArea'),logo=document.getElementById('formStoreLogo').src;
   var ds=new Date(f.date).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   var tms=new Date(f.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  var h='<div class="rc-header"><img class="rc-logo" src="'+logo+'"><h2>'+f.storeName+'</h2><div class="rc-date">'+ds+' - '+tms+'</div></div>';
+  var curSym={EUR:'€',USD:'$',GBP:'£',CHF:'Fr'};
+  var curCls={EUR:'rc-cur-eur',USD:'rc-cur-usd',GBP:'rc-cur-gbp',CHF:'rc-cur-chf'};
+  var h='<div class="rc-header"><img class="rc-logo" src="'+logo+'"><h2>'+f.storeName+'</h2><div class="rc-date">'+ds+' — '+tms+'</div></div>';
   h+='<div class="rc-section">DÖVİZ</div>';
-  DOVIZLER.forEach(function(k){if(f.amounts[k])h+='<div class="rc-row"><span>'+k+' ('+f.amounts[k]+' x '+fN(f.rates[k])+')</span><span>'+fT(f.results[k])+' TL</span></div>';});
+  DOVIZLER.forEach(function(k){if(f.amounts[k])h+='<div class="rc-row"><span class="rc-cur '+curCls[k]+'">'+curSym[k]+' '+k+'</span> <span>'+f.amounts[k]+' x '+fN(f.rates[k])+'</span><span class="rc-val">'+fT(f.results[k])+' TL</span></div>';});
   h+='<div class="rc-row rc-bold"><span>Döviz Toplam</span><span>'+fT(f.dovizToplam)+' TL</span></div>';
   h+='<div class="rc-section">KASA</div>';
-  h+='<div class="rc-row"><span>TL Toplam</span><span>'+fT(f.toplamTL)+' TL</span></div>';
+  h+='<div class="rc-row"><span>TL Toplam</span><span class="rc-val">'+fT(f.toplamTL)+' TL</span></div>';
   h+='<div class="rc-row rc-bold"><span>TOPLAM SONUÇ</span><span>'+fT(f.toplamSonuc)+' TL</span></div>';
-  h+='<div class="rc-row"><span>Kasa Float</span><span>-'+fT(f.kasaFloat)+' TL</span></div>';
-  if(f.kasaCikisi)h+='<div class="rc-row"><span>Kasa Çıkışı (bilgi)</span><span>'+fT(f.kasaCikisi)+' TL</span></div>';
-  h+='<div class="rc-row"><span>Micros Toplam</span><span>-'+fT(f.microsTotal)+' TL</span></div>';
-  var col=f.genelSonuc>=0?'#16a34a':'#ef4444';
-  h+='<div class="rc-big" style="color:'+col+'">GENEL SONUÇ: '+fT(f.genelSonuc)+' TL</div>';
+  h+='<div class="rc-row"><span>Kasa Float</span><span class="rc-val">−'+fT(f.kasaFloat)+' TL</span></div>';
+  if(f.kasaCikisi)h+='<div class="rc-row"><span>Kasa Çıkışı (bilgi)</span><span class="rc-val">'+fT(f.kasaCikisi)+' TL</span></div>';
+  h+='<div class="rc-row"><span>Micros Toplam</span><span class="rc-val">−'+fT(f.microsTotal)+' TL</span></div>';
+  var bigCls=f.genelSonuc>=0?'rc-big-pos':'rc-big-neg';
+  h+='<div class="rc-big '+bigCls+'">GENEL SONUÇ: '+fT(f.genelSonuc)+' TL</div>';
   h+='<div class="rc-footer">RAMEX&amp;MERSAŞ Kasa Takip Sistemi<br>Developed by Ömer Kızıldaş</div>';
   ra.innerHTML=h;ra.style.left='0';
   html2canvas(ra,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(c){
@@ -368,14 +382,22 @@ function gecmisFisleri(){
     var items=[];s.forEach(function(c){var v=c.val();if(v.store===currentStore)items.push(v);});
     items.reverse();var h='';
     if(!items.length)h='<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">Kayıt bulunamadı</div>';
-    items.forEach(function(f){
+    items.forEach(function(f,idx){
       var d=new Date(f.date),ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}),tms=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
       var col=f.genelSonuc>=0?'val-green':'val-red';
-      h+='<div class="history-item"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+f.storeName+'</span></div><div class="hi-result '+col+'">'+fT(f.genelSonuc)+' TL</div></div>';
+      var det='';
+      DOVIZLER.forEach(function(k){if(f.amounts&&f.amounts[k])det+=k+': '+f.amounts[k]+' x '+fN(f.rates[k])+' = <span>'+fT(f.results[k])+' TL</span><br>';});
+      det+='TL: <span>'+fT(f.toplamTL)+' TL</span><br>';
+      det+='Toplam Sonuç: <span>'+fT(f.toplamSonuc)+' TL</span><br>';
+      det+='Float: <span>-'+fT(f.kasaFloat||0)+' TL</span><br>';
+      if(f.kasaCikisi)det+='Çıkış: <span>'+fT(f.kasaCikisi)+' TL</span><br>';
+      det+='Micros: <span>-'+fT(f.microsTotal)+' TL</span>';
+      h+='<div class="history-item" onclick="toggleHi('+idx+')"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+f.storeName+'</span></div><div class="hi-result '+col+'">'+fT(f.genelSonuc)+' TL</div><div class="hi-detail" id="hd-'+idx+'">'+det+'</div></div>';
     });
     document.getElementById('historyList').innerHTML=h;
   });
 }
+function toggleHi(i){var el=document.getElementById('hd-'+i);el.classList.toggle('show');}
 function backToForm(){document.getElementById('stepHistory').style.display='none';document.getElementById('stepForm').style.display='block';}
 function logout(){document.getElementById('stepForm').style.display='none';document.getElementById('stepStore').style.display='block';document.querySelectorAll('.store-card').forEach(function(c){c.className='store-card'});currentStore=null;}
 
