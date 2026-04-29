@@ -18,8 +18,13 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0f0f1e;--bg2:#161630;--card:#191934;--gold:#c9a84c;--gold2:#e0c068;--green:#2dd4a0;--red:#ef6461;--text:#e4e4f0;--text2:#8888a8;--border:#2a2a4a;--alaturk:#2dd4bf;--jax:#f59e0b;--skylar:#a78bfa}
-html{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
-body{min-height:100dvh;max-width:480px;margin:0 auto;background:var(--bg)}
+body.light{--bg:#f5f4f0;--bg2:#ffffff;--card:#ffffff;--gold:#a07e22;--gold2:#8a6c1c;--green:#1d8a4e;--red:#c43a3a;--text:#1a1a1a;--text2:#6a6862;--border:#d5d3cc;--alaturk:#0d9488;--jax:#d97706;--skylar:#6d28d9}
+html{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;transition:background .35s}
+body{min-height:100dvh;max-width:480px;margin:0 auto;background:var(--bg);transition:background .35s,color .35s}
+body *{transition:background-color .35s,border-color .35s,color .35s}
+.theme-toggle{position:fixed;top:14px;right:14px;width:50px;height:28px;border-radius:14px;background:var(--card);border:1px solid var(--border);cursor:pointer;z-index:50;padding:0;font-family:inherit}
+.theme-toggle .knob{width:22px;height:22px;border-radius:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));position:absolute;top:2px;left:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#0f0f1e;transition:left .3s ease}
+body.light .theme-toggle .knob{left:24px;color:#fff}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield}
 input,button,select{font-family:inherit;outline:none}
@@ -160,6 +165,7 @@ button{cursor:pointer}
 </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Tema değiştir"><span class="knob" id="themeKnob">☾</span></button>
 <div class="header fade-up">
 <h1>RAMEX&amp;MERSAŞ</h1>
 <div class="sub">KASA &amp; KUR TAKİP SİSTEMİ</div>
@@ -569,6 +575,27 @@ function kurWhatsapp(){window.open('https://wa.me/?text='+encodeURIComponent(kur
 function fT(n){return n.toFixed(2).replace('.',',');}
 function fN(n){return n?n.toFixed(2).replace('.',','):'0,00';}
 function pF(id){return parseFloat(document.getElementById(id).value)||0;}
+
+/* ============== TEMA TOGGLE ============== */
+function toggleTheme(){
+  var b=document.body;
+  var isLight=b.classList.toggle('light');
+  var k=document.getElementById('themeKnob');
+  if(k)k.textContent=isLight?'☀':'☾';
+  try{localStorage.setItem('rm-theme',isLight?'light':'dark');}catch(e){}
+  var meta=document.querySelector('meta[name=theme-color]');
+  if(meta)meta.setAttribute('content',isLight?'#f5f4f0':'#0f0f1e');
+}
+(function(){
+  try{
+    var t=localStorage.getItem('rm-theme');
+    if(t==='light'){
+      document.body.classList.add('light');
+      var k=document.getElementById('themeKnob');if(k)k.textContent='☀';
+      var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','#f5f4f0');
+    }
+  }catch(e){}
+})();
 
 /* ================= GÜN SONU ================= */
 var GS_CATS=['Yönetim','Otopark','Market','Operasyon','Personel','Teknik','Temizlik','Diğer'];
