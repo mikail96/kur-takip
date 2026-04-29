@@ -2,9 +2,15 @@
   "rules": {
     "liveRates": { ".read": true, ".write": true },
     "kasaRates": { ".read": true, ".write": true },
+    "previousKasaRates": { ".read": true, ".write": true },
     "kasaPasswords": { ".read": true, ".write": true },
     "kasaFlotlar": { ".read": true, ".write": true },
     "kasaFisler": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["date", "store"]
+    },
+    "gunSonuRaporlar": {
       ".read": true,
       ".write": true,
       ".indexOn": ["date", "store"]
