@@ -5,6 +5,8 @@ const { logger } = require("firebase-functions");
 
 initializeApp();
 
+const KASA_MARGIN = 0.9; // TCMB efektif alış × 0.9
+
 exports.nightlyKasaSync = onSchedule(
   { schedule: "0 0 * * *", timeZone: "Europe/Istanbul", region: "europe-west1" },
   async () => {
@@ -22,15 +24,20 @@ exports.nightlyKasaSync = onSchedule(
       logger.warn("previousKasaRates yedek alınamadı:", e.message);
     }
 
-    // 2) liveRates -> kasaRates (mevcut davranış, dokunmadık)
+    // 2) liveRates -> kasaRates  (× 0.9 marjı uygulanır)
     const snap = await db.ref("liveRates").once("value");
     const live = snap.val();
     if (live) {
       const kasaRates = {};
-      ["EUR", "USD", "GBP", "CHF"].forEach((k) => { if (live[k]) kasaRates[k] = live[k]; });
+      ["EUR", "USD", "GBP", "CHF"].forEach((k) => {
+        if (typeof live[k] === "number" && live[k] > 0) {
+          // 4 ondalık yuvarlama
+          kasaRates[k] = Math.round(live[k] * KASA_MARGIN * 10000) / 10000;
+        }
+      });
       kasaRates.updatedAt = new Date().toISOString();
       await db.ref("kasaRates").set(kasaRates);
-      logger.info("kasaRates güncellendi", kasaRates);
+      logger.info("kasaRates güncellendi (×0.9)", kasaRates);
     }
 
     // 3) 7 günden eski kasaFisler (mevcut davranış)
@@ -43,7 +50,7 @@ exports.nightlyKasaSync = onSchedule(
       logger.info("Eski fişler silindi:", Object.keys(updates).length);
     }
 
-    // 4) 7 günden eski gunSonuRaporlar (yeni)
+    // 4) 7 günden eski gunSonuRaporlar
     try {
       const oldGsSnap = await db.ref("gunSonuRaporlar").orderByChild("date").endAt(weekAgo).once("value");
       const gsUpdates = {};
