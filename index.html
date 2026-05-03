@@ -868,12 +868,16 @@ function gsWhatsappPaylas(){
   var ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   var tms=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
   var h='<div class="rc-header"><img class="rc-logo" src="'+logo+'"><h2>'+f.storeName+'</h2><div class="rc-date">GÜN SONU RAPORU<br>'+ds+' - '+tms+'</div>'+(f.haz?'<div class="rc-date" style="margin-top:2px">Hazırlayan: '+f.haz+'</div>':'')+'</div>';
-  if(f.nakitTL>0)h+='<div class="rc-row"><span>Nakit TL</span><span>'+fT(f.nakitTL)+' ₺</span></div>';
+  var hasDoviz=DOVIZLER.some(function(k){return (f.doviz[k]||0)>0;});
+  if(hasDoviz)h+='<div class="rc-section">DÖVİZ</div>';
   DOVIZLER.forEach(function(k){
     var a=f.doviz[k]||0;if(!a)return;
-    h+='<div class="rc-row gs-info-row"><span>'+k+' ('+a+' x '+fN(f.rates[k])+')</span><span>'+fT(f.dr[k])+' ₺</span></div>';
+    var sym=(DM[k]&&DM[k].s)||'';
+    h+='<div class="rc-row gs-info-row"><span>'+sym+' '+k+' ('+a+' x '+fN(f.rates[k])+')</span><span>'+fT(f.dr[k])+' ₺</span></div>';
   });
   if(f.dt>0)h+='<div class="rc-row rc-bold gs-info-row"><span>Döviz Toplamı</span><span>'+fT(f.dt)+' ₺</span></div>';
+  if(f.nakitTL>0||f.kkSatis>0)h+='<div class="rc-section">KASA</div>';
+  if(f.nakitTL>0)h+='<div class="rc-row"><span>Nakit TL</span><span>'+fT(f.nakitTL)+' ₺</span></div>';
   if(f.kkSatis>0)h+='<div class="rc-row gs-kk-row"><span>Kredi Kartı</span><span>'+fT(f.kkSatis)+' ₺</span></div>';
   h+='<div class="rc-section">SİSTEM KONTROLÜ</div>';
   h+='<div class="rc-row"><span>Z Raporu</span><span>'+fT(f.zRaporu)+' ₺</span></div>';
