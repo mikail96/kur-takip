@@ -494,7 +494,7 @@ function buildRows(){
 
 function hesapla(){
   var dt=0;
-  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?(kasaRates[k]||0):0,s=a*r;dt+=s;document.getElementById('res_'+k).textContent=fT(s);});
+  DOVIZLER.forEach(function(k){var a=pF('inp_'+k),r=kasaRates?(kasaRates[k]||0):0;r=Math.round(r*100)/100;var s=a*r;dt+=s;document.getElementById('res_'+k).textContent=fT(s);});
   var tl=pF('inputTL');
   document.getElementById('resTL').textContent=fT(tl);
   var ts=dt+tl;
@@ -515,7 +515,7 @@ function hesapla(){
 
 function kaydet(){
   var am={},res={},dt=0;
-  DOVIZLER.forEach(function(k){am[k]=pF('inp_'+k);res[k]=am[k]*(kasaRates[k]||0);dt+=res[k];});
+  DOVIZLER.forEach(function(k){am[k]=pF('inp_'+k);var r=Math.round((kasaRates[k]||0)*100)/100;res[k]=am[k]*r;dt+=res[k];});
   var tl=pF('inputTL'),fl=pF('inputFloat'),cx=pF('inputCikis'),mi=pF('inputMicros');
   var ts=dt+tl,net=ts-fl,g=net-mi;
   var fd={store:currentStore,storeName:STORES[currentStore].name,date:new Date().toISOString(),amounts:am,toplamTL:tl,microsTotal:mi,kasaFloat:fl,kasaCikisi:cx,rates:kasaRates,results:res,dovizToplam:dt,toplamSonuc:ts,genelSonuc:g};
@@ -798,6 +798,7 @@ function gsHesapla(){
   DOVIZLER.forEach(function(k){
     var a=parseFloat((document.getElementById('gsInp_'+k)||{}).value)||0;
     var r=gsRates?(gsRates[k]||0):0;
+    r=Math.round(r*100)/100;
     var s=a*r;dr[k]=s;dt+=s;
     var resEl=document.getElementById('gsRes_'+k);
     if(resEl)resEl.textContent=fT(s);
