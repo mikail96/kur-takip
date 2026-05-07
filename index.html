@@ -122,15 +122,15 @@ button{cursor:pointer}
 .hi-btn.hi-share{color:var(--gold);border-color:var(--gold)}
 .hi-btn.hi-del{color:var(--red);border-color:rgba(239,100,97,.4)}
 body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
-#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#fff;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
+#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#FFE100;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
 #receiptArea .rc-header{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
 #receiptArea .rc-header .rc-logo{width:48px;height:48px;object-fit:contain;margin-bottom:4px}
 #receiptArea .rc-header h2{font-size:15px;letter-spacing:2px}
-#receiptArea .rc-header .rc-date{font-size:11px;color:#666;margin-top:2px}
-#receiptArea .rc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px dotted #ddd}
+#receiptArea .rc-header .rc-date{font-size:11px;color:#222;margin-top:2px;font-weight:500}
+#receiptArea .rc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px dotted rgba(0,0,0,.25)}
 #receiptArea .rc-row.rc-bold{font-weight:700;font-size:13px}
-#receiptArea .rc-section{font-size:10px;font-weight:700;color:#888;letter-spacing:1px;margin:8px 0 4px;text-transform:uppercase}
-#receiptArea .rc-footer{text-align:center;font-size:9px;color:#999;margin-top:10px;border-top:1px solid #ddd;padding-top:8px}
+#receiptArea .rc-section{font-size:10px;font-weight:800;color:#000;letter-spacing:1.5px;margin:10px 0 4px;text-transform:uppercase;background:rgba(0,0,0,.08);padding:4px 8px;border-radius:4px}
+#receiptArea .rc-footer{text-align:center;font-size:9px;color:#333;margin-top:10px;border-top:1px solid rgba(0,0,0,.3);padding-top:8px;font-weight:500}
 #receiptArea .rc-big{font-size:18px;font-weight:800;text-align:center;padding:8px 0;margin-top:4px}
 .kur-badge{display:inline-block;margin:8px auto 14px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:3px 14px;font-size:11px;color:var(--gold);font-weight:700}
 .kur-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
@@ -209,12 +209,12 @@ body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
 .gs-fx-foot .l{color:var(--text2)}
 .gs-fx-foot .v{font-weight:700;color:#7eb6ff}
 .gs-rate-tag{display:inline-block;font-size:9px;color:var(--text2);font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px}
-#receiptArea .rc-row.gs-warn-row{color:#d49030}
-#receiptArea .rc-row.gs-info-row{color:#2a60a8}
-#receiptArea .rc-row.gs-kk-row{color:#5648b0}
-#receiptArea .rc-banka{display:flex;justify-content:space-between;background:#f4f1ea;border-radius:8px;padding:10px 12px;margin-top:8px}
-#receiptArea .rc-banka .l{font-size:13px;font-weight:800;color:#a07e22}
-#receiptArea .rc-banka .v{font-size:18px;font-weight:900}
+#receiptArea .rc-row.gs-warn-row{color:#a85a18;font-weight:600}
+#receiptArea .rc-row.gs-info-row{color:#1a4884;font-weight:600}
+#receiptArea .rc-row.gs-kk-row{color:#3e3088;font-weight:600}
+#receiptArea .rc-banka{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:10px;padding:12px 14px;margin-top:10px;border:2px solid #000;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+#receiptArea .rc-banka .l{font-size:13px;font-weight:800;color:#7a5d10}
+#receiptArea .rc-banka .v{font-size:19px;font-weight:900}
 </style>
 </head>
 <body>
@@ -545,7 +545,7 @@ function whatsappFisPaylas(){
   h+='<div class="rc-big" style="color:'+col+'">GENEL SONUÇ: '+fT(f.genelSonuc)+' TL</div>';
   h+='<div class="rc-footer">RAMEX&amp;MERSAŞ Kasa Takip Sistemi<br>Developed by Ömer Kızıldaş</div>';
   ra.innerHTML=h;ra.style.left='0';
-  html2canvas(ra,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(c){
+  html2canvas(ra,{scale:2,backgroundColor:'#FFE100',useCORS:true}).then(function(c){
     ra.style.left='-9999px';
     c.toBlob(function(b){
       var file=new File([b],'kasa-fis.png',{type:'image/png'});
@@ -889,11 +889,11 @@ function gsWhatsappPaylas(){
   }
   if(f.cikislar&&f.cikislar.length){
     h+='<div class="rc-section">ÇIKIŞLAR</div>';
-    f.cikislar.forEach(function(c){h+='<div class="rc-row" style="color:#b33"><span>'+c.kat+'</span><span>−'+fT(c.tut)+' ₺</span></div>';});
-    h+='<div class="rc-row rc-bold" style="color:#b33"><span>Toplam Çıkış</span><span>−'+fT(f.tc)+' ₺</span></div>';
+    f.cikislar.forEach(function(c){h+='<div class="rc-row" style="color:#a32a28"><span>'+c.kat+'</span><span>−'+fT(c.tut)+' ₺</span></div>';});
+    h+='<div class="rc-row rc-bold" style="color:#a32a28"><span>Toplam Çıkış</span><span>−'+fT(f.tc)+' ₺</span></div>';
   }
   h+='<div class="rc-row rc-bold"><span>TOPLAM CİRO</span><span>'+fT(f.ciro)+' ₺</span></div>';
-  var bcol=f.banka>=0?'#1a7a42':'#b33';
+  var bcol=f.banka>=0?'#0d7a3a':'#a32a28';
   h+='<div class="rc-banka"><span class="l">BANKAYA YATACAK</span><span class="v" style="color:'+bcol+'">'+fT(f.banka)+' ₺</span></div>';
   if(f.ksf!==0)h+='<div class="rc-row gs-warn-row" style="margin-top:6px"><span>Kasa Sayım Farkı (bankaya dahil değil)</span><span>'+fT(f.ksf)+' ₺</span></div>';
   if(f.notlar&&f.notlar.length){
@@ -902,7 +902,7 @@ function gsWhatsappPaylas(){
   }
   h+='<div class="rc-footer">RAMEX&amp;MERSAŞ Gün Sonu Raporu<br>Developed by Ömer Kızıldaş</div>';
   ra.innerHTML=h;ra.style.left='0';
-  html2canvas(ra,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(function(c){
+  html2canvas(ra,{scale:2,backgroundColor:'#FFE100',useCORS:true}).then(function(c){
     ra.style.left='-9999px';
     c.toBlob(function(b){
       var file=new File([b],'gun-sonu.png',{type:'image/png'});
