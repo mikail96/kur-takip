@@ -122,7 +122,7 @@ button{cursor:pointer}
 .hi-btn.hi-share{color:var(--gold);border-color:var(--gold)}
 .hi-btn.hi-del{color:var(--red);border-color:rgba(239,100,97,.4)}
 body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
-#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#FFE100;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
+#receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#FFEB3B;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
 #receiptArea .rc-header{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
 #receiptArea .rc-header .rc-logo{width:48px;height:48px;object-fit:contain;margin-bottom:4px}
 #receiptArea .rc-header h2{font-size:15px;letter-spacing:2px}
@@ -545,7 +545,7 @@ function whatsappFisPaylas(){
   h+='<div class="rc-big" style="color:'+col+'">GENEL SONUÇ: '+fT(f.genelSonuc)+' TL</div>';
   h+='<div class="rc-footer">RAMEX&amp;MERSAŞ Kasa Takip Sistemi<br>Developed by Ömer Kızıldaş</div>';
   ra.innerHTML=h;ra.style.left='0';
-  html2canvas(ra,{scale:2,backgroundColor:'#FFE100',useCORS:true}).then(function(c){
+  html2canvas(ra,{scale:2,backgroundColor:'#FFEB3B',useCORS:true}).then(function(c){
     ra.style.left='-9999px';
     c.toBlob(function(b){
       var file=new File([b],'kasa-fis.png',{type:'image/png'});
@@ -902,7 +902,7 @@ function gsWhatsappPaylas(){
   }
   h+='<div class="rc-footer">RAMEX&amp;MERSAŞ Gün Sonu Raporu<br>Developed by Ömer Kızıldaş</div>';
   ra.innerHTML=h;ra.style.left='0';
-  html2canvas(ra,{scale:2,backgroundColor:'#FFE100',useCORS:true}).then(function(c){
+  html2canvas(ra,{scale:2,backgroundColor:'#FFEB3B',useCORS:true}).then(function(c){
     ra.style.left='-9999px';
     c.toBlob(function(b){
       var file=new File([b],'gun-sonu.png',{type:'image/png'});
