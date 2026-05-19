@@ -426,7 +426,7 @@ body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
 <script>
 firebase.initializeApp({apiKey:"AIzaSyCq4SVq8m6njwB4ltSnHUYnAsAQyE5MVbc",authDomain:"ramex-kasa.firebaseapp.com",databaseURL:"https://ramex-kasa-default-rtdb.europe-west1.firebasedatabase.app",projectId:"ramex-kasa",storageBucket:"ramex-kasa.firebasestorage.app",messagingSenderId:"213575036627",appId:"1:213575036627:web:5839a7566f9f06f57eae26"});
 var db=firebase.database();
-var INDIRIM=0.10,WORKER_URL='https://kur-proxy.mikailaymaz1.workers.dev';
+var INDIRIM=0.10;
 var DOVIZLER=['EUR','USD','GBP','CHF'];
 var DM={
   USD:{s:'$',isim:'Amerikan Doları',flag:'🇺🇸',cls:'kur-usd'},
@@ -593,17 +593,21 @@ async function kurlariCek(){
   document.getElementById('kurBtnKopyala').style.display='none';
   document.getElementById('kurBtnWa').style.display='none';
   try{
-    var r=await fetch(WORKER_URL),xt=await r.text(),p=new DOMParser(),x=p.parseFromString(xt,'text/xml'),cs=x.querySelectorAll('Currency');
+    /* Firebase /liveRates'ten oku - Cloud Function fetchLiveRates her gun 16:00'da TCMB'den cekip yaziyor */
+    var snap=await db.ref('liveRates').once('value');
+    var data=snap.val();
+    if(!data)throw new Error('Henuz kur verisi yok, lutfen biraz sonra tekrar deneyin');
     liveRates={};
-    cs.forEach(function(c){var k=c.getAttribute('Kod');if(DM[k]){var ea=c.querySelector('BanknoteBuying');if(ea&&ea.textContent){var v=parseFloat(ea.textContent.replace(',','.'));if(v>0)liveRates[k]={e:v,h:v*(1-INDIRIM)};}}});
-    if(!Object.keys(liveRates).length)throw new Error('Kur verisi bulunamadı');
-    var fb={updatedAt:new Date().toISOString()};
-    DOVIZLER.forEach(function(k){if(liveRates[k])fb[k]=liveRates[k].e;});
-    db.ref('liveRates').set(fb).catch(function(){});
+    DOVIZLER.forEach(function(k){
+      if(typeof data[k]==='number'&&data[k]>0){
+        liveRates[k]={e:data[k],h:data[k]*(1-INDIRIM)};
+      }
+    });
+    if(!Object.keys(liveRates).length)throw new Error('Kur verisi okunamadi');
     kurKartGoster();
-    var n=new Date();
+    var n=data.updatedAt?new Date(data.updatedAt):new Date();
     document.getElementById('kurTarih').textContent=n.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' '+n.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  }catch(e){ht.textContent=e.message||'Kurlar alınamadı';ht.style.display='block';}
+  }catch(e){ht.textContent=e.message||'Kurlar alinamadi';ht.style.display='block';}
   ld.style.display='none';
 }
 
