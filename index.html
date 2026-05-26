@@ -120,6 +120,7 @@ button{cursor:pointer}
 .history-item .hi-result{font-size:16px;font-weight:700}
 .hi-btn{padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px}
 .hi-btn.hi-share{color:var(--gold);border-color:var(--gold)}
+.hi-btn.hi-edit{color:var(--alaturk);border-color:var(--alaturk)}
 .hi-btn.hi-del{color:var(--red);border-color:rgba(239,100,97,.4)}
 body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
 #receiptArea{position:absolute;left:-9999px;top:0;width:380px;background:#FFEB3B;color:#111;font-family:"DM Sans",sans-serif;padding:20px}
@@ -408,7 +409,7 @@ body.light .hi-btn.hi-del{border-color:rgba(196,58,58,.5)}
 </div>
 </div>
 
-<button class="btn-gold fade-up d5" onclick="gsKaydet()">KAYDET</button>
+<button class="btn-gold fade-up d5" id="gsKaydetBtn" onclick="gsKaydet()">KAYDET</button>
 <button class="btn-green" id="gsBtnPaylas" style="display:none" onclick="gsWhatsappPaylas()">WHATSAPP PAYLAŞ</button>
 <button class="btn-outline" onclick="gsGecmisRaporlar()">GEÇMİŞ RAPORLAR</button>
 <button class="btn-logout" onclick="gsLogout()">ÇIKIŞ</button>
@@ -668,7 +669,7 @@ function toggleTheme(){
 /* ================= GÜN SONU ================= */
 var GS_CATS=['Yönetim','Otopark','Market','Operasyon','Personel','Teknik','Temizlik','Diğer'];
 var GS_GRACE_HOUR=2;
-var gsCurrentStore=null,gsRates=null,gsRatesSource=null,gsRatesGrace=false,gsLastRapor=null;
+var gsCurrentStore=null,gsRates=null,gsRatesSource=null,gsRatesGrace=false,gsLastRapor=null,gsEditId=null,gsEditDate=null;
 var gsCikislar=[{kat:'Operasyon',tut:''}],gsNotlar=[''];
 
 function gsSelectStore(k){
@@ -721,6 +722,8 @@ function gsResolveRates(){
 }
 
 function gsLoadForm(){
+  gsEditId=null;gsEditDate=null;
+  var _sb=document.getElementById('gsKaydetBtn');if(_sb)_sb.textContent='KAYDET';
   document.getElementById('gsStepPw').style.display='none';
   document.getElementById('gsStepForm').style.display='block';
   var logo=document.getElementById('gs-logo-'+gsCurrentStore).src;
@@ -837,10 +840,11 @@ function gsKaydet(){
   var v=gsHesapla();
   if(!v.nv&&!v.dt&&!v.kv){alert('En az bir değer girin');return;}
   var doviz={};DOVIZLER.forEach(function(k){doviz[k]=parseFloat((document.getElementById('gsInp_'+k)||{}).value)||0;});
+  var isEdit=!!gsEditId;
   var rapor={
     store:gsCurrentStore,
     storeName:STORES[gsCurrentStore].name,
-    date:new Date().toISOString(),
+    date:isEdit?gsEditDate:new Date().toISOString(),
     haz:document.getElementById('gsHaz').value||'',
     nakitTL:v.nv,
     doviz:doviz,
@@ -857,13 +861,24 @@ function gsKaydet(){
     ksf:pF('gsKsf'),
     notlar:gsNotlar.filter(function(n){return (n||'').trim();}),
     rates:gsRates,
-    ratesSource:gsRatesSource
+    ratesSource:isEdit?'edit':gsRatesSource
   };
-  db.ref('gunSonuRaporlar').push().set(rapor).then(function(){
-    gsLastRapor=rapor;
-    document.getElementById('gsBtnPaylas').style.display='block';
-    alert('Gün sonu raporu kaydedildi!');
-  }).catch(function(e){alert('Hata: '+e.message);});
+  if(isEdit){
+    rapor.editedAt=new Date().toISOString();
+    db.ref('gunSonuRaporlar/'+gsEditId).update(rapor).then(function(){
+      gsLastRapor=Object.assign({_id:gsEditId},rapor);
+      document.getElementById('gsBtnPaylas').style.display='block';
+      alert('Rapor güncellendi!');
+      gsEditId=null;gsEditDate=null;
+      var sb=document.getElementById('gsKaydetBtn');if(sb)sb.textContent='KAYDET';
+    }).catch(function(e){alert('Hata: '+e.message);});
+  } else {
+    db.ref('gunSonuRaporlar').push().set(rapor).then(function(){
+      gsLastRapor=rapor;
+      document.getElementById('gsBtnPaylas').style.display='block';
+      alert('Gün sonu raporu kaydedildi!');
+    }).catch(function(e){alert('Hata: '+e.message);});
+  }
 }
 
 function gsWhatsappPaylas(){
@@ -929,7 +944,7 @@ function gsGecmisRaporlar(){
       var col=f.banka>=0?'val-green':'val-red';
       h+='<div class="history-item"><div class="hi-top"><span>'+ds+' '+tms+'</span><span>'+(f.haz||f.storeName)+'</span></div>'+
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div style="font-size:10px;color:var(--text2)">CİRO: '+fT(f.ciro)+'</div><div class="hi-result '+col+'">'+fT(f.banka)+' ₺</div></div>'+
-        '<div style="display:flex;gap:6px"><button class="hi-btn hi-share" onclick="gsHistoryShare(\''+f._id+'\')">PAYLAŞ</button><button class="hi-btn hi-del" onclick="gsHistoryDelete(\''+f._id+'\')">SİL</button></div></div></div>';
+        '<div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end"><button class="hi-btn hi-share" onclick="gsHistoryShare(\''+f._id+'\')">PAYLAŞ</button><button class="hi-btn hi-edit" onclick="gsHistoryEdit(\''+f._id+'\')">DÜZENLE</button><button class="hi-btn hi-del" onclick="gsHistoryDelete(\''+f._id+'\')">SİL</button></div></div></div>';
     });
     document.getElementById('gsHistoryList').innerHTML=h;
     window._gsHistItems={};items.forEach(function(f){window._gsHistItems[f._id]=f;});
@@ -939,6 +954,53 @@ function gsHistoryShare(id){
   var f=window._gsHistItems&&window._gsHistItems[id];if(!f)return;
   gsLastRapor=f;gsWhatsappPaylas();
 }
+function gsHistoryEdit(id){
+  var f=window._gsHistItems&&window._gsHistItems[id];if(!f)return;
+  var pw=prompt('Admin şifresi (düzenlemek için):');
+  if(pw!=='3636'){if(pw!==null)alert('Yanlış şifre');return;}
+  /* Düzenleme moduna geç */
+  gsEditId=id;
+  gsEditDate=f.date;
+  /* O raporun kaydedildiği günkü kurları kullan */
+  gsRates=f.rates||{EUR:0,USD:0,GBP:0,CHF:0};
+  gsRatesSource='edit';
+  gsRatesGrace=false;
+  /* Ekran geçişi */
+  document.getElementById('gsStepHistory').style.display='none';
+  document.getElementById('gsStepForm').style.display='block';
+  var logo=document.getElementById('gs-logo-'+gsCurrentStore).src;
+  document.getElementById('gsFormStoreLogo').src=logo;
+  document.getElementById('gsFormStoreName').textContent=STORES[gsCurrentStore].name;
+  document.getElementById('gsFormStoreName').style.color=STORES[gsCurrentStore].color;
+  /* Form alanlarını doldur */
+  document.getElementById('gsNakitTL').value=f.nakitTL||'';
+  document.getElementById('gsKK').value=f.kkSatis||'';
+  document.getElementById('gsZ').value=f.zRaporu||'';
+  document.getElementById('gsMicros').value=f.micros||'';
+  document.getElementById('gsHaz').value=f.haz||'';
+  document.getElementById('gsKsf').value=f.ksf||'';
+  gsCikislar=(f.cikislar&&f.cikislar.length)?f.cikislar.map(function(c){return {kat:c.kat,tut:String(c.tut)};}):[{kat:'Operasyon',tut:''}];
+  gsNotlar=(f.notlar&&f.notlar.length)?f.notlar.slice():[''];
+  gsLastRapor=null;
+  document.getElementById('gsBtnPaylas').style.display='none';
+  /* Düzenleme uyarısı + kur bilgisi */
+  var d=new Date(f.date);
+  var ds=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('gsRateNotice').innerHTML='<div class="gs-warn">✏️ DÜZENLEME MODU — '+ds+' raporu düzenleniyor. O günkü kur korunuyor, değişmez.</div>';
+  document.getElementById('gsRateTag').textContent='kayıtlı kur';
+  /* Döviz alanlarını kur. Sonra miktarları doldur. */
+  gsBuildDovizRows();
+  DOVIZLER.forEach(function(k){
+    var inp=document.getElementById('gsInp_'+k);
+    if(inp&&f.doviz&&f.doviz[k])inp.value=f.doviz[k];
+  });
+  gsRenderCikisRows();
+  gsRenderNotRows();
+  gsHesapla();
+  /* KAYDET butonunu GÜNCELLE yap */
+  var saveBtn=document.getElementById('gsKaydetBtn');
+  if(saveBtn)saveBtn.textContent='GÜNCELLE';
+}
 function gsHistoryDelete(id){
   var pw=prompt('Admin şifresi (silmek için):');
   if(pw!=='3636'){if(pw!==null)alert('Yanlış şifre');return;}
@@ -946,7 +1008,7 @@ function gsHistoryDelete(id){
   db.ref('gunSonuRaporlar/'+id).remove().then(function(){alert('Silindi');gsGecmisRaporlar();}).catch(function(e){alert('Hata: '+e.message);});
 }
 function gsBackToForm(){document.getElementById('gsStepHistory').style.display='none';document.getElementById('gsStepForm').style.display='block';}
-function gsLogout(){document.getElementById('gsStepForm').style.display='none';document.getElementById('gsStepStore').style.display='block';document.querySelectorAll('#panelGunSonu .store-card').forEach(function(c){c.className='store-card'});gsCurrentStore=null;}
+function gsLogout(){gsEditId=null;gsEditDate=null;var _sb=document.getElementById('gsKaydetBtn');if(_sb)_sb.textContent='KAYDET';document.getElementById('gsStepForm').style.display='none';document.getElementById('gsStepStore').style.display='block';document.querySelectorAll('#panelGunSonu .store-card').forEach(function(c){c.className='store-card'});gsCurrentStore=null;}
 </script>
 </body>
 </html>
